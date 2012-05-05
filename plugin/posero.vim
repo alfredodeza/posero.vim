@@ -73,9 +73,11 @@ let g:posero_current_slide = 1
 let g:posero_current_line = 0
 let g:posero_total_slides = 1
 
+
 function! s:StartSlide()
     call s:LoadFile("/Users/adeza/tmp/ipython.posero")
 endfunction
+
 
 function! s:NextSlide(slide_number)
     if a:slide_number > g:posero_total_slides
@@ -83,21 +85,34 @@ function! s:NextSlide(slide_number)
         call s:Echo(msg)
         return
     endif
-    " FIXME how can we clear all of our changes? tracking every time? noooo
-    execute "silent normal 300u"
+    call s:ClearBuffer()
     let g:posero_current_slide = a:slide_number
     let g:posero_current_line = 0
 endfunction
 
-function! s:PreviousSlide(slide_number)
-    " FIXME how can we clear all of our changes? tracking every time? noooo
+
+function! s:ClearBuffer()
+    " This is *very* naive but I assume
+    " that if we are not at the very first line
+    " in the very first column I need to keep
+    " undoing until I am.
+    let current_line = line('.')
+    let current_column = col('.')
     execute "silent normal 300u"
+    if (current_line != 1) || (current_column != 1)
+        call s:ClearBuffer() 
+    endif
+endfunction
+
+
+function! s:PreviousSlide(slide_number)
+    call s:ClearBuffer()
     if a:slide_number > 0
         let g:posero_current_slide = a:slide_number
     endif
     let g:posero_current_line = 0
-
 endfunction
+
 
 function! s:Next(number)
     let slide = g:posero_presentation[g:posero_current_slide]
@@ -116,12 +131,14 @@ function! s:Next(number)
     let g:posero_current_line = a:number
 endfunction
 
+
 function! s:Previous(number)
     execute "normal u"
     if a:number > 0
         let g:posero_current_line = a:number
     endif
 endfunction
+
 
 function! s:LoadFile(file_path)
     let contents = readfile(a:file_path)
@@ -145,10 +162,13 @@ function! s:LoadFile(file_path)
     let g:posero_presentation =  new_presentation
 endfunction
 
+
 function! s:Completion(ArgLead, CmdLine, CursorPos)
-    let actions = "goto\nstart\n"
+    " I can't make this work for files and custom arguments
+    " FIXME should revisit this at some point.
     let _version = "version\n"
-    return actions . _version
+    let file_list = split(globpath(&path, a:ArgLead), "\n")
+    return file_list 
 endfunction
 
 
@@ -158,18 +178,16 @@ endfunction
 
 
 function! s:Proxy(action)
-    if (a:action == "goto")
-        echo "NotImplemented"
-    elseif (a:action == "start")
+    if filereadable(a:action)
+        call s:LoadFile(a:action)
         call s:CreateBuffer()
         call s:StartSlide()
     elseif (a:action == "version")
         call s:Version()
     else
-        call s:Echo("Not a valid Posero option ==> " . a:action)
+        call s:Echo("Posero: not a valid file or option ==> " . a:action)
     endif
 endfunction
 
-command! -nargs=+ -complete=custom,s:Completion Posero call s:Proxy(<f-args>)
 
-
+command! -nargs=+ -complete=file Posero call s:Proxy(<f-args>)
