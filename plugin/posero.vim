@@ -97,15 +97,22 @@ function! s:LoadFile(file_path)
     let slide_number = 1
     let line_number = 1
     let new_presentation = {}
+    let slide = {}
     for line in contents
-        let new_presentation[line_number] = line
-        let line_number = line_number + 1
+        if line =~ '\v^\>{79,}'
+            let new_presentation[slide_number] = slide
+            let slide_number = slide_number + 1
+            let slide = {}
+        else
+            let slide[line_number] = line
+            let line_number = line_number + 1
+        endif
     endfor
     let g:posero_presentation =  new_presentation
 endfunction
 
 function! s:Completion(ArgLead, CmdLine, CursorPos)
-    let actions = "goto\n"
+    let actions = "goto\nstart\n"
     let _version = "version\n"
     return actions . _version
 endfunction
