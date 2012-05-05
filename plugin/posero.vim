@@ -52,6 +52,7 @@ function! s:FakeTyping(text)
         endfor
         let lineno += 1
     endfor
+    execute 'normal o'
 endfun
 
 function! s:CreateBuffer()
@@ -59,31 +60,36 @@ function! s:CreateBuffer()
 	"silent! execute  winnr < 0 ? 'botright new ' . 'LastSession.pytest' : winnr . 'wincmd w'
 	setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number filetype=posero
     autocmd! BufEnter LastSession.pytest call s:CloseIfLastWindow()
-    nnoremap <script> <buffer> <left>  :call <sid>Previous(g:current_slide-1)<CR>
-    nnoremap <script> <buffer> h       :call <sid>Previous(g:current_slide-1)<CR>
-    nnoremap <script> <buffer> <right> :call <sid>Next(g:current_slide+1)<CR>
-    nnoremap <script> <buffer> l       :call <sid>Next(g:current_slide+1)<CR>
+    nnoremap <script> <buffer> <left>  :call <sid>Previous(g:posero_current_slide-1)<CR>
+    nnoremap <script> <buffer> h       :call <sid>Previous(g:posero_current_slide-1)<CR>
+    nnoremap <script> <buffer> <right> :call <sid>Next(g:posero_current_slide+1)<CR>
+    nnoremap <script> <buffer> l       :call <sid>Next(g:posero_current_slide+1)<CR>
 
 endfunction
 
-let g:presentation = {}
-let g:current_slide = 0
+let g:posero_presentation = {}
+let g:posero_current_slide = 0
 
 function! s:StartSlide()
     call s:LoadFile("/Users/adeza/tmp/ipython.posero")
-    "for line in g:presentation
-        "call s:FakeTyping(line)
-    "endfor
 endfunction
 
 function! s:Next(number)
-    execute "normal a" . g:presentation[a:number]. "\<CR>"
-    let g:current_slide = a:number
+    if g:posero_presentation[a:number] =~ "^\s*$"
+        execute "normal o"
+    elseif g:posero_presentation[a:number] =~ '\v^In\s+'
+        call s:FakeTyping(g:posero_presentation[a:number])
+    else
+        execute "normal a" . g:posero_presentation[a:number]. "\<CR>"
+    endif
+    let g:posero_current_slide = a:number
 endfunction
 
 function! s:Previous(number)
     execute "normal u"
-    let g:current_slide = a:number
+    if a:number > 0
+        let g:posero_current_slide = a:number
+    endif
 endfunction
 
 function! s:LoadFile(file_path)
@@ -95,7 +101,7 @@ function! s:LoadFile(file_path)
         let new_presentation[line_number] = line
         let line_number = line_number + 1
     endfor
-    let g:presentation =  new_presentation
+    let g:posero_presentation =  new_presentation
 endfunction
 
 function! s:Completion(ArgLead, CmdLine, CursorPos)
