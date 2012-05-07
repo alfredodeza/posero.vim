@@ -60,6 +60,7 @@ function! s:FakeTyping(text)
             endif
         endfor
         let lineno += 1
+        normal $
     endfor
     execute 'normal o'
 endfun
@@ -67,13 +68,28 @@ endfun
 function! s:CreateBuffer()
     enew
 	setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-    autocmd! BufEnter LastSession.pytest call s:CloseIfLastWindow()
+    "autocmd! BufEnter LastSession.pytest call s:CloseIfLastWindow()
     nnoremap <silent><script> <buffer> <left>  :call <sid>Previous()<CR>
     nnoremap <silent><script> <buffer> h       :call <sid>Previous()<CR>
     nnoremap <silent><script> <buffer> <right> :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> l       :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> L       :call <sid>NextSlide(g:posero_current_slide+1)<CR>
     nnoremap <silent><script> <buffer> H       :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
+endfunction
+
+
+"check if a syntax file exists for the given filetype - and attempt to
+"load one
+function! s:Checkable(ft)
+    if !exists("g:loaded_" . a:ft . "_syntax_checker")
+        exec "runtime syntax_checkers/" . a:ft . ".vim"
+    endif
+
+    return exists("*SyntaxCheckers_". a:ft ."_GetLocList")
+endfunction
+
+function! s:LoadSyntax(ft)
+    exec "runtime posero_syntax/" . a:ft . ".vim"
 endfunction
 
 
@@ -139,7 +155,6 @@ function! s:Next(number)
     else
         let g:posero_current_line = a:number
     endif
-
 endfunction
 
 
@@ -166,8 +181,8 @@ function! s:LoadFile(file_path)
             let slide = {}
             let slide_options = []
             let new_presentation[slide_number] = slide
-        elseif line =~ '\v^POSERO\=\='
-            let sourceable_line = split(line, "POSERO==>")[0]
+        elseif line =~ '\v^POSERO\>\>'
+            let sourceable_line = split(line, "POSERO>>")[0]
             call add(slide_options, sourceable_line)
         else
             let slide[line_number] = line
@@ -177,6 +192,9 @@ function! s:LoadFile(file_path)
     let g:posero_presentation =  new_presentation
 endfunction
 
+function! s:SetSyntax()
+   call s:LoadSyntax(b:posero_syntax)
+endfunction
 
 function! s:Completion(ArgLead, CmdLine, CursorPos)
     " I can't make this work for files and custom arguments
@@ -197,6 +215,7 @@ function! s:Proxy(action)
         call s:LoadFile(a:action)
         call s:CreateBuffer()
         call s:SourceOptions()
+        call s:SetSyntax()
     elseif (a:action == "version")
         call s:Version()
     else
