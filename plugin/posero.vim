@@ -111,6 +111,7 @@ endfunction
 
 
 function! s:NextSlide(slide_number)
+    call s:SetSyntax()
     if a:slide_number > g:posero_total_slides
         let msg = "Already at last slide? slide_number was: " . a:slide_number
         call s:Echo(msg)
@@ -119,6 +120,7 @@ function! s:NextSlide(slide_number)
     call s:ClearBuffer()
     let g:posero_current_slide = a:slide_number
     let g:posero_current_line = 1
+    call s:SourceOptions()
 endfunction
 
 
@@ -137,11 +139,13 @@ endfunction
 
 
 function! s:PreviousSlide(slide_number)
+    call s:SetSyntax()
     call s:ClearBuffer()
     if a:slide_number > 0
         let g:posero_current_slide = a:slide_number
     endif
     let g:posero_current_line = 1
+    call s:SourceOptions()
 endfunction
 
 
@@ -170,12 +174,16 @@ function! s:Next(number)
             if (slide[a:number] !~ b:posero_fake_type)
                 let g:posero_current_line = a:number + 1
                 redraw
-                call s:Next(a:number+1)
+                if has_key(slide, a:number+1)
+                    call s:Next(a:number+1)
+                endif
             endif
         else
             let g:posero_current_line = a:number + 1
             redraw
-            call s:Next(a:number+1)
+            if has_key(slide, a:number+1)
+                call s:Next(a:number+1)
+            endif
         endif
     else
         let g:posero_current_line = a:number
@@ -191,21 +199,23 @@ endfunction
 
 function! s:LoadFile(file_path)
     let contents = readfile(a:file_path)
+    let content_len = len(contents)
     let slide_number = 1
     let line_number = 1
     let new_presentation = {}
     let slide = {}
     let slide_options = []
+    let loop_count = 0
     for line in contents
-        if line =~ '\v^\>{79,}'
+        let loop_count = loop_count + 1
+        if line =~ '\v^\>{79,}' || (loop_count == content_len)
             let slide["options"] = slide_options
             let new_presentation[slide_number] = slide
-            let slide_number = slide_number + 1
             let line_number = 1
+            let slide_number = slide_number + 1
             let g:posero_total_slides = g:posero_total_slides + 1
             let slide = {}
             let slide_options = []
-            let new_presentation[slide_number] = slide
         elseif line =~ '\v^POSERO\>\>'
             let sourceable_line = split(line, "POSERO>>")[0]
             call add(slide_options, sourceable_line)
@@ -214,18 +224,16 @@ function! s:LoadFile(file_path)
             let line_number = line_number + 1
         endif
     endfor
-    " make sure that we can work with a single slide
-    if slide_number == 1
-        let new_presentation[1] = slide
-    endif
     let g:posero_presentation =  new_presentation
 endfunction
+
 
 function! s:SetSyntax()
     if (exists("b:posero_syntax"))
        call s:LoadSyntax(b:posero_syntax)
     endif
 endfunction
+
 
 function! s:Completion(ArgLead, CmdLine, CursorPos)
     " I can't make this work for files and custom arguments
