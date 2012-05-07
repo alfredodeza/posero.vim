@@ -9,6 +9,16 @@ if exists("g:loaded_posero") || &cp
   finish
 endif
 
+function! s:PoseroSyntax() abort
+  let b:current_syntax = 'posero'
+  syn match PoseroDelimeter            '\v\>{70,}'
+  syn match PoseroOptions              '\v^POSERO\>\>'
+
+  hi def link PoseroDelimeter          Error
+  hi def link PoseroOptions            Statement
+endfunction
+
+au BufEnter *.posero call s:PoseroSyntax()
 
 " Globals
 let g:posero_presentation = {}
@@ -55,7 +65,7 @@ function! s:FakeTyping(text)
             call cursor(lineno, 0)
             "normal z. FIXME this would center the screen, we want that?
             if c !~ '\s'
-                sleep 25m
+                sleep 15m
                 redraw
             endif
         endfor
@@ -94,7 +104,7 @@ endfunction
 
 
 function! s:SourceOptions()
-    for line in g:posero_presentation[g:posero_current_slide]["options"]
+    for line in get(g:posero_presentation[g:posero_current_slide], "options", [])
         execute line
     endfor
 endfunction
@@ -142,16 +152,31 @@ function! s:Next(number)
         call s:Echo(msg, 1)
         return
     endif
-    if (exists('b:posero_fake_type')) && (slide[a:number] =~ b:posero_fake_type)
-        call s:FakeTyping(slide[a:number])
+    " Make sure we go to the actual line if we are about to write
+    execute a:number
+    if (exists('b:posero_fake_type'))
+        if (exists('b:posero_fake_type'))
+            if (slide[a:number] =~ b:posero_fake_type)
+                call s:FakeTyping(slide[a:number])
+            endif
+        endif
     elseif slide[a:number] =~ "^\s*$"
         execute "normal o"
     else
         execute "normal a" . slide[a:number]. "\<CR>"
     endif
-    if (exists("b:posero_push_on_non_fake")) && (slide[a:number] !~ b:posero_fake_type)
-        let g:posero_current_line = a:number + 1
-        call s:Next(a:number+1)
+    if (exists("b:posero_push_on_non_fake"))
+        if (exists('b:posero_fake_type'))
+            if (slide[a:number] !~ b:posero_fake_type)
+                let g:posero_current_line = a:number + 1
+                redraw
+                call s:Next(a:number+1)
+            endif
+        else
+            let g:posero_current_line = a:number + 1
+            redraw
+            call s:Next(a:number+1)
+        endif
     else
         let g:posero_current_line = a:number
     endif
@@ -189,11 +214,17 @@ function! s:LoadFile(file_path)
             let line_number = line_number + 1
         endif
     endfor
+    " make sure that we can work with a single slide
+    if slide_number == 1
+        let new_presentation[1] = slide
+    endif
     let g:posero_presentation =  new_presentation
 endfunction
 
 function! s:SetSyntax()
-   call s:LoadSyntax(b:posero_syntax)
+    if (exists("b:posero_syntax"))
+       call s:LoadSyntax(b:posero_syntax)
+    endif
 endfunction
 
 function! s:Completion(ArgLead, CmdLine, CursorPos)
