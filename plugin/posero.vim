@@ -113,7 +113,7 @@ endfunction
 function! s:NextSlide(slide_number)
     call s:SetSyntax()
     if a:slide_number > g:posero_total_slides
-        let msg = "Already at last slide? slide_number was: " . a:slide_number
+        let msg = "Already at the last slide"
         call s:Echo(msg)
         return
     endif
@@ -156,37 +156,28 @@ function! s:Next(number)
         call s:Echo(msg, 1)
         return
     endif
+    let g:posero_current_line = a:number
     " Make sure we go to the actual line if we are about to write
     execute a:number
-    if (exists('b:posero_fake_type'))
-        if (exists('b:posero_fake_type'))
-            if (slide[a:number] =~ b:posero_fake_type)
-                call s:FakeTyping(slide[a:number])
-            endif
-        endif
+    if (exists('b:posero_fake_type')) && (slide[a:number] =~ b:posero_fake_type)
+            call s:FakeTyping(slide[a:number])
+            return " we return here because we don't want to mix with block pushes
     elseif slide[a:number] =~ "^\s*$"
         execute "normal o"
     else
         execute "normal a" . slide[a:number]. "\<CR>"
     endif
-    if (exists("b:posero_push_on_non_fake"))
-        if (exists('b:posero_fake_type'))
-            if (slide[a:number] !~ b:posero_fake_type)
-                let g:posero_current_line = a:number + 1
-                redraw
-                if has_key(slide, a:number+1)
-                    call s:Next(a:number+1)
-                endif
-            endif
-        else
-            let g:posero_current_line = a:number + 1
-            redraw
-            if has_key(slide, a:number+1)
-                call s:Next(a:number+1)
-            endif
+
+    " This pushes blocks of text that do not match fake_typing if both
+    " fake_type and push_on_non_fake are set, we basically call ourselves
+    " again so that the lines above can take care of inserting whatever
+    " we need. Note how this portion does not introduce text, it just calls
+    " itself.
+    if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && (slide[a:number] !~ b:posero_fake_type)
+        redraw
+        if has_key(slide, a:number+1)
+            call s:Next(a:number+1)
         endif
-    else
-        let g:posero_current_line = a:number
     endif
 endfunction
 
