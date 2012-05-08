@@ -37,14 +37,17 @@ set statusline+=%{g:posero_total_slides}
 set statusline+=]
 endfunction
 
+
 au BufEnter *.posero call s:PoseroSyntax()
 
-"
-" Globals
-let g:posero_presentation = {}
-let g:posero_current_slide = 1
-let g:posero_current_line = 1
-let g:posero_total_slides = 1
+
+function! s:SetGlobals() abort
+    " Globals
+    let g:posero_presentation = {}
+    let g:posero_current_slide = 1
+    let g:posero_current_line = 1
+    let g:posero_total_slides = 1
+endfunction
 
 
 function! s:Echo(msg, ...)
@@ -92,28 +95,12 @@ endfun
 function! s:CreateBuffer()
     enew
 	setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-    "autocmd! BufEnter LastSession.pytest call s:CloseIfLastWindow()
     nnoremap <silent><script> <buffer> <left>  :call <sid>Previous()<CR>
     nnoremap <silent><script> <buffer> h       :call <sid>Previous()<CR>
     nnoremap <silent><script> <buffer> <right> :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> l       :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> L       :call <sid>NextSlide(g:posero_current_slide+1)<CR>
     nnoremap <silent><script> <buffer> H       :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
-endfunction
-
-
-"check if a syntax file exists for the given filetype - and attempt to
-"load one
-function! s:Checkable(ft)
-    if !exists("g:loaded_" . a:ft . "_syntax_checker")
-        exec "runtime syntax_checkers/" . a:ft . ".vim"
-    endif
-
-    return exists("*SyntaxCheckers_". a:ft ."_GetLocList")
-endfunction
-
-function! s:LoadSyntax(ft)
-    exec "runtime posero_syntax/" . a:ft . ".vim"
 endfunction
 
 
@@ -245,6 +232,11 @@ function! s:SetSyntax()
 endfunction
 
 
+function! s:LoadSyntax(ft)
+    exec "runtime posero_syntax/" . a:ft . ".vim"
+endfunction
+
+
 function! s:Completion(ArgLead, CmdLine, CursorPos)
     " I can't make this work for files and custom arguments
     " FIXME should revisit this at some point.
@@ -261,6 +253,7 @@ endfunction
 
 function! s:Proxy(action)
     if filereadable(a:action)
+        call s:SetGlobals()
         call s:LoadFile(a:action)
         call s:CreateBuffer()
         call s:SourceOptions()
