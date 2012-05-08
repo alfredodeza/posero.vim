@@ -38,8 +38,12 @@ that file::
 
     :Posero terminal_test.txt
 
-Once it loads, you will get a blank buffer. 
+Once it loads, you will get a blank buffer ready to be used with the loaded
+text.
 
+
+Movement or flow control
+------------------------
 Mappings to start and control the flow of the presentation are:
 
 * *l* or <down> display next line in text
