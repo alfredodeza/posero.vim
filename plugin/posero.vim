@@ -9,6 +9,7 @@ if exists("g:loaded_posero") || &cp
   finish
 endif
 
+
 function! s:PoseroSyntax() abort
   let b:current_syntax = 'posero'
   syn match PoseroDelimeter            '\v\>{70,}'
@@ -18,8 +19,27 @@ function! s:PoseroSyntax() abort
   hi def link PoseroOptions            Statement
 endfunction
 
+
+function! s:SetStatusLine() abort
+set statusline = ""
+set statusline+=Line:
+set statusline+=[
+set statusline+=%{g:posero_current_line}
+set statusline+=/
+set statusline+=%{posero#GetTotalLines()}
+set statusline+=]
+set statusline+=%=
+set statusline+=\ Slide:
+set statusline+=[
+set statusline+=%{g:posero_current_slide}
+set statusline+=/
+set statusline+=%{g:posero_total_slides}
+set statusline+=]
+endfunction
+
 au BufEnter *.posero call s:PoseroSyntax()
 
+"
 " Globals
 let g:posero_presentation = {}
 let g:posero_current_slide = 1
@@ -41,15 +61,9 @@ function! s:Echo(msg, ...)
 endfun
 
 
-function! s:GoToError(error_line)
-    let split_line    = matchlist(a:error_line, '\v(line\s+)(\d+)')
-    let split_column  = matchlist(a:error_line, '\v(column\s+)(\d+)')
-    let line_number   = split_line[2]
-    let column_number = split_column[2]
-    execute line_number
-    execute "normal " . column_number . "|"
-    let g:posero_has_errors = 1
-endfunction!
+function! posero#GetTotalLines() abort
+    return len(g:posero_presentation[g:posero_current_slide])-1
+endfunction
 
 
 function! s:FakeTyping(text)
@@ -111,12 +125,12 @@ endfunction
 
 
 function! s:NextSlide(slide_number)
-    call s:SetSyntax()
     if a:slide_number > g:posero_total_slides
         let msg = "Already at the last slide"
         call s:Echo(msg)
         return
     endif
+    call s:SetSyntax()
     call s:ClearBuffer()
     let g:posero_current_slide = a:slide_number
     let g:posero_current_line = 1
@@ -161,7 +175,8 @@ function! s:Next(number)
     execute a:number
     if (exists('b:posero_fake_type')) && (slide[a:number] =~ b:posero_fake_type)
             call s:FakeTyping(slide[a:number])
-            return " we return here because we don't want to mix with block pushes
+            " we return here because we don't want to mix with block pushes
+            return
     elseif slide[a:number] =~ "^\s*$"
         execute "normal o"
     else
@@ -204,9 +219,13 @@ function! s:LoadFile(file_path)
             let new_presentation[slide_number] = slide
             let line_number = 1
             let slide_number = slide_number + 1
-            let g:posero_total_slides = g:posero_total_slides + 1
             let slide = {}
             let slide_options = []
+            if (loop_count == content_len)
+                let g:posero_total_slides = g:posero_total_slides
+            else
+                let g:posero_total_slides = g:posero_total_slides + 1
+            endif
         elseif line =~ '\v^POSERO\>\>'
             let sourceable_line = split(line, "POSERO>>")[0]
             call add(slide_options, sourceable_line)
@@ -246,6 +265,7 @@ function! s:Proxy(action)
         call s:CreateBuffer()
         call s:SourceOptions()
         call s:SetSyntax()
+        call s:SetStatusLine()
     elseif (a:action == "version")
         call s:Version()
     else
