@@ -95,12 +95,14 @@ endfun
 function! s:CreateBuffer()
     enew
 	setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-    nnoremap <silent><script> <buffer> <left>  :call <sid>Previous()<CR>
+    nnoremap <silent><script> <buffer> <up>    :call <sid>Previous()<CR>
     nnoremap <silent><script> <buffer> h       :call <sid>Previous()<CR>
-    nnoremap <silent><script> <buffer> <right> :call <sid>Next(g:posero_current_line+1)<CR>
+    nnoremap <silent><script> <buffer> <down>  :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> l       :call <sid>Next(g:posero_current_line+1)<CR>
     nnoremap <silent><script> <buffer> L       :call <sid>NextSlide(g:posero_current_slide+1)<CR>
+    nnoremap <silent><script> <buffer> <right> :call <sid>NextSlide(g:posero_current_slide+1)<CR>
     nnoremap <silent><script> <buffer> H       :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
+    nnoremap <silent><script> <buffer> <left>  :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
 endfunction
 
 
