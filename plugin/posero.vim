@@ -106,7 +106,12 @@ endfunction
 
 function! s:SourceOptions()
     for line in get(g:posero_presentation[g:posero_current_slide], "options", [])
-        execute line
+        try
+            execute line
+        catch /(.*)/
+            let msg = "Exception raised: " . v:exception . " Executing line >> " . line
+            call s:Echo(msg)
+        endtry
     endfor
 endfunction
 
