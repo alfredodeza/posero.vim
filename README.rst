@@ -6,6 +6,12 @@ Presentation (replay!) of text or terminal action in Vim. Copy any kind of text
 from the terminal into a file and use ``Posero`` or use *any* kind of plain
 text file to use it as presentation material.
 
+.. warning::
+   I consider this plugin as pre-alpha status, that is, I have it in an utterly
+   inconsistent state where I keep breaking it. Try it out, let me know what
+   you think and send me some feedback, but do realize this is still work in
+   progress. 
+
 
 Why oh why?
 -----------
