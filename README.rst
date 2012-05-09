@@ -97,3 +97,32 @@ mapping (``l`` or ``<down>``) and undo a single line every time you hit the
 can be set like::
 
     POSERO>> let b:posero_push_on_non_fake = 1
+
+Custom syntax
+-------------
+This plugin comes with a directory for custom syntax files called
+``posero_syntax`` and it should be at the top level of the plugin directory
+with a few examples on how they should look like. If you just saved an IPython
+session and want to use the custom syntax bundled with this plugin you would
+set it like this on the slide::
+
+    POSERO>> let b:posero_syntax = "ipython"
+
+As you may notice, the name of the syntax is the same as the first portion of
+the syntax file (in this case, called ``ipython.vim``). Any new syntax files
+would have to follow that pattern. For example, if you have one for ``curl``
+you would need to add a ``posero_syntax/curl.vim`` file and then do::
+
+    POSERO>> let b:posero_syntax = "curl"
+
+Having the ability for custom syntax highlighting is nice, but remember,
+``Posero`` allows you to do real Vim syntax and options, so if you are
+presenting a pure Python file you could just set the filetype to python::
+
+    POSERO>> let filetype=python
+
+That is also useful if you are changing from some Python to RestructuredText on
+the next slide, and you want RST syntax there. ``Posero`` will call those
+options on every slide change so your changes are set before anything is
+displayed.
+
