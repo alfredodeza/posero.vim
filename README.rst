@@ -1,9 +1,10 @@
-Posero
-======
-
+posero.vim
+==========
+**follow @alfredodeza for updates**
 Presentation (replay!) of text or terminal action in Vim. Copy any kind of text
 from the terminal into a file and use ``Posero`` or use *any* kind of plain
 text file to use it as presentation material.
+
 
 Why oh why?
 -----------
@@ -126,3 +127,7 @@ the next slide, and you want RST syntax there. ``Posero`` will call those
 options on every slide change so your changes are set before anything is
 displayed.
 
+The name
+--------
+The name comes from peruvian slang, that basically means "show off". You do
+want to show of your terminal action, don't you?
