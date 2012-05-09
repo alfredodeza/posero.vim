@@ -1,6 +1,7 @@
 posero.vim
 ==========
 **follow @alfredodeza for updates**
+
 Presentation (replay!) of text or terminal action in Vim. Copy any kind of text
 from the terminal into a file and use ``Posero`` or use *any* kind of plain
 text file to use it as presentation material.
