@@ -70,6 +70,7 @@ endfunction
 
 
 function! s:FakeTyping(text)
+    let fake_delay = {'a': '50m', 'e': '90m', 'i': '80m', 'o': '70m', 'u': '3m'}
     let lineno = line('.')
     let lines = split(a:text, "\n")
     for line in lines
@@ -82,7 +83,8 @@ function! s:FakeTyping(text)
             call cursor(lineno, 0)
             "normal z. FIXME this would center the screen, we want that?
             if c !~ '\s'
-                sleep 15m
+                let sleep_time = get(fake_delay, c, '10m')
+                execute "sleep " . sleep_time
                 redraw
             endif
         endfor
