@@ -128,6 +128,19 @@ the next slide, and you want RST syntax there. ``Posero`` will call those
 options on every slide change so your changes are set before anything is
 displayed.
 
+Posero syntax
+-------------
+``Posero`` has its own syntax highlighting. This is automatically set for you
+if you are naming your presentation file with the ``.posero`` extension.
+
+StatusLine
+----------
+A very basic status line is set by default with the current line number, total
+line numbers of the current slide on the left and the slide number with the
+total slide numbers on the right::
+
+    Line:[1/18]                                         Slide:[1/4]
+
 The name
 --------
 The name comes from peruvian slang, that basically means "show off". You do
