@@ -50,6 +50,18 @@ function! s:SetGlobals() abort
 endfunction
 
 
+function! s:ResetBufferVars() abort
+    let b:posero_fake_type = '\v(.*)@!'
+    let b:posero_syntax = 0
+    if exists("b:posero_push_all")
+        unlet b:posero_push_all
+    endif
+    if exists("b:posero_push_on_non_fake")
+        unlet b:posero_push_on_non_fake
+    endif
+endfunction
+
+
 function! s:Echo(msg, ...)
     redraw!
     let x=&ruler | let y=&showcmd
@@ -121,16 +133,17 @@ endfunction
 
 
 function! s:NextSlide(slide_number)
+    call s:ResetBufferVars()
     if a:slide_number > g:posero_total_slides
         let msg = "Already at the last slide"
         call s:Echo(msg)
         return
     endif
-    call s:SetSyntax()
     call s:ClearBuffer()
     let g:posero_current_slide = a:slide_number
     let g:posero_current_line = 1
     call s:SourceOptions()
+    call s:SetSyntax()
 endfunction
 
 
@@ -149,13 +162,14 @@ endfunction
 
 
 function! s:PreviousSlide(slide_number)
-    call s:SetSyntax()
+    call s:ResetBufferVars()
     call s:ClearBuffer()
     if a:slide_number > 0
         let g:posero_current_slide = a:slide_number
     endif
     let g:posero_current_line = 1
     call s:SourceOptions()
+    call s:SetSyntax()
 endfunction
 
 
@@ -170,9 +184,15 @@ function! s:Next(number)
     " Make sure we go to the actual line if we are about to write
     execute a:number
     if (exists('b:posero_fake_type')) && (slide[a:number] =~ b:posero_fake_type)
-            call s:FakeTyping(slide[a:number])
-            " we return here because we don't want to mix with block pushes
-            return
+        call s:FakeTyping(slide[a:number])
+        if (exists("b:posero_push_all"))
+            redraw
+            if has_key(slide, a:number+1)
+                call s:Next(a:number+1)
+            endif
+        endif
+        " we return here because we don't want to mix with block pushes
+        return
     elseif slide[a:number] =~ "^\s*$"
         execute "normal o"
     else
@@ -185,6 +205,11 @@ function! s:Next(number)
     " we need. Note how this portion does not introduce text, it just calls
     " itself.
     if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && (slide[a:number] !~ b:posero_fake_type)
+        redraw
+        if has_key(slide, a:number+1)
+            call s:Next(a:number+1)
+        endif
+    elseif (exists("b:posero_push_all"))
         redraw
         if has_key(slide, a:number+1)
             call s:Next(a:number+1)
@@ -235,7 +260,7 @@ endfunction
 
 
 function! s:SetSyntax()
-    if (exists("b:posero_syntax"))
+    if exists("b:posero_syntax")
        call s:LoadSyntax(b:posero_syntax)
     endif
 endfunction
