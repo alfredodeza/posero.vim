@@ -25,7 +25,7 @@ but all of them lacked the ability to all of these features I wanted:
 * Custom specific options per slide.
 * Add custom syntax to non-syntax output (for example: curl output)
 
-Basic usage
+Get started
 -----------
 The simplest way to get started, once the plugin is installed, is by calling
 the plugin and pass in a file as an argument.
