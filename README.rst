@@ -46,7 +46,9 @@ that file::
     :Posero terminal_test.txt
 
 Once it loads, you will get a blank buffer ready to be used with the loaded
-text.
+text. Just hit ``l`` or ``<down>`` and see what happens!
+
+For more options, tweaks, syntax and flow control, read below.
 
 
 Movement or flow control
