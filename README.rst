@@ -81,6 +81,11 @@ options **per slide**. This is done with a simple syntax::
 
     this is some text on the slide. The above option will not appear here.
 
+All slide options are reset from one slide to another, so unless you are making
+system-wide changes (like setting the filetype to something different) you need
+to set them again to have the same behavior, this avoids *sticky* options where
+previous slide options are applied for the current one.
+
 Fake Typing and output chunks
 -----------------------------
 To have a more realistic feel, you can enable *fake typing* on certain lines.
@@ -104,6 +109,19 @@ mapping (``l`` or ``<down>``) and undo a single line every time you hit the
 can be set like::
 
     POSERO>> let b:posero_push_on_non_fake = 1
+
+
+Fake Type Everything
+--------------------
+You could also *fake type* the whole slide. To accomplish this you would need
+to set ``b:posero_fake_type`` and ``b:posero_push_all`` on the slide like
+this::
+
+    POSERO>> let b:posero_push_all = 1
+    POSERO>> let b:posero_fake_type = '\v(.*)'
+
+This will go through every line and matching fake typing but will continue to
+push lines because ``b:posero_push_all`` is set.
 
 Custom syntax
 -------------
