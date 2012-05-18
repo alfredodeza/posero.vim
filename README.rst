@@ -30,6 +30,12 @@ Get started
 The simplest way to get started, once the plugin is installed, is by calling
 the plugin and pass in a file as an argument.
 
+**make sure you set default mappings**
+
+In your .vimrc::
+
+    let g:posero_default_mappings = 1
+
 Lets assume we have the following output from our terminal and we have saved it
 as ``terminal_test.txt`` ::
 
@@ -46,7 +52,7 @@ that file::
     :Posero terminal_test.txt
 
 Once it loads, you will get a blank buffer ready to be used with the loaded
-text. Just hit ``l`` or ``<down>`` and see what happens!
+text. Just hit ``Ctrl-l`` and see what happens!
 
 For more options, tweaks, syntax and flow control, read below.
 
