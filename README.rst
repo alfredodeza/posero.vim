@@ -53,12 +53,38 @@ For more options, tweaks, syntax and flow control, read below.
 
 Movement or flow control
 ------------------------
-Mappings to start and control the flow of the presentation are:
+Mappings have to be enabled, so **make sure** you have the following flag
+set on your ``.vimrc``::
 
-* *l* or <down> display next line in text
-* *h* or <up> undo the last displayed line of text
-* *L* or <right> <move to the next slide
-* *H* or <left> move to the previous slide
+    let g:posero_default_mappings = 1
+
+To just use your own mappings and disable the default ones set the value to
+zero::
+
+    let g:posero_default_mappings = 0
+
+If you do not have any mappings and are not enabling or turning off the
+setting, the plugin will warn you about this problem.
+
+These are the default mappings for the plugin:
+
+* Ctrl-h   = Previous slide
+* Ctrl-j   = Next line
+* Ctrl-k   = Previous line
+* Ctrl-l   = Next slide
+
+If you don't like those, you can set your own custom mappings as the plugin
+allows calls to the functions that control the flow of the presentation. This
+is how you would map arrow keys for the length of the presentation::
+
+    nnoremap <silent> <buffer> <up>    :call posero#PreviousLine()<CR>
+    nnoremap <silent> <buffer> <down>  :call posero#NextLine()<CR>
+    nnoremap <silent> <buffer> <right> :call posero#NextSlide()<CR>
+    nnoremap <silent> <buffer> <left>  :call posero#PreviousSlide()<CR>
+
+You can obviously map these to any key combination you want, the above are only
+suggestions.
+
 
 Multiple slides
 ---------------
