@@ -93,7 +93,6 @@ function! s:FakeTyping(text)
             let words .= c
             call setline(lineno, words)
             call cursor(lineno, 0)
-            "normal z. FIXME this would center the screen, we want that?
             if c !~ '\s'
                 let sleep_time = get(fake_delay, c, '10m')
                 execute "sleep " . sleep_time
@@ -109,14 +108,35 @@ endfun
 function! s:CreateBuffer()
     enew
 	setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-    nnoremap <silent><script> <buffer> <up>    :call <sid>Previous()<CR>
-    nnoremap <silent><script> <buffer> h       :call <sid>Previous()<CR>
-    nnoremap <silent><script> <buffer> <down>  :call <sid>Next(g:posero_current_line+1)<CR>
-    nnoremap <silent><script> <buffer> l       :call <sid>Next(g:posero_current_line+1)<CR>
-    nnoremap <silent><script> <buffer> L       :call <sid>NextSlide(g:posero_current_slide+1)<CR>
-    nnoremap <silent><script> <buffer> <right> :call <sid>NextSlide(g:posero_current_slide+1)<CR>
-    nnoremap <silent><script> <buffer> H       :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
-    nnoremap <silent><script> <buffer> <left>  :call <sid>PreviousSlide(g:posero_current_slide-1)<CR>
+    if exists("g:posero_default_mappings")
+        if g:posero_default_mappings == 1
+            nnoremap <silent> <buffer> <C-h> :call posero#PreviousSlide()<CR>
+            nnoremap <silent> <buffer> <C-l> :call posero#NextSlide()<CR>
+            nnoremap <silent> <buffer> <C-j> :call posero#NextLine()<CR>
+            nnoremap <silent> <buffer> <C-k> :call posero#PreviousLine()<CR>
+        endif
+    else
+        call s:Echo("Posero has no current mappings for flow control!")
+    endif
+endfunction
+
+
+" Helper Mappings for Flow control
+
+function! posero#NextSlide()
+    call s:NextSlide(g:posero_current_slide + 1)
+endfunction
+
+function! posero#PreviousSlide()
+    call s:PreviousSlide(g:posero_current_slide - 1)
+endfunction
+
+function! posero#NextLine()
+    call s:Next(g:posero_current_line + 1)
+endfunction
+
+function! posero#PreviousLine()
+    call s:Previous()
 endfunction
 
 
