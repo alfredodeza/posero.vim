@@ -53,12 +53,9 @@ endfunction
 function! s:ResetBufferVars() abort
     let b:posero_fake_type = '\v(.*)@!'
     let b:posero_syntax = 0
-    if exists("b:posero_push_all")
-        unlet b:posero_push_all
-    endif
-    if exists("b:posero_push_on_non_fake")
-        unlet b:posero_push_on_non_fake
-    endif
+    unlet! b:posero_push_all
+    unlet! b:posero_push_on_non_fake
+    unlet! b:posero_auto_next_line
 endfunction
 
 
@@ -116,7 +113,7 @@ function! s:CreateBuffer()
             nnoremap <silent> <buffer> <C-k> :call posero#PreviousLine()<CR>
         endif
     else
-        call s:Echo("Posero has no current mappings for flow control!")
+        call s:Echo("Posero has no current mappings for flow control! Use `let g:posero_default_mappings = 1` in your .vimrc")
     endif
 endfunction
 
@@ -164,6 +161,7 @@ function! s:NextSlide(slide_number)
     let g:posero_current_line = 1
     call s:SourceOptions()
     call s:SetSyntax()
+    call s:AutoNextLine()
 endfunction
 
 
@@ -190,6 +188,13 @@ function! s:PreviousSlide(slide_number)
     let g:posero_current_line = 1
     call s:SourceOptions()
     call s:SetSyntax()
+    call s:AutoNextLine()
+endfunction
+
+function! s:AutoNextLine()
+    if exists("b:posero_auto_next_line") && b:posero_auto_next_line == 1
+        call s:Next(g:posero_current_line+1)
+    endif
 endfunction
 
 
@@ -313,6 +318,7 @@ function! s:Proxy(action)
         call s:SourceOptions()
         call s:SetSyntax()
         call s:SetStatusLine()
+        call s:AutoNextLine()
     elseif (a:action == "version")
         call s:Version()
     else
