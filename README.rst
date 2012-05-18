@@ -105,6 +105,7 @@ times::
     and this would be slide number two. You would not see any of the text
     from the first slide here.
 
+
 Slide options
 -------------
 As you can imagine, all of this action is hapenning on real Vim buffers, so
@@ -119,6 +120,20 @@ All slide options are reset from one slide to another, so unless you are making
 system-wide changes (like setting the filetype to something different) you need
 to set them again to have the same behavior, this avoids *sticky* options where
 previous slide options are applied for the current one.
+
+
+"Normal" slide
+--------------
+If you want old fashioned slides that output a bunch of text all at once as
+soon as you get to a given slide, you need 2 options playing together::
+
+    POSERO>> let b:posero_auto_next_line = 1
+    POSERO>> let b:posero_push_all = 1
+
+The ``auto_next_line`` option tells the plugin to trigger a call to the next
+line, which in turn realizes that ``push_all`` is set and it will get
+everything on that slide printed at once.
+
 
 Fake Typing and output chunks
 -----------------------------
