@@ -262,17 +262,18 @@ function! s:LoadFile(file_path)
     for line in contents
         let loop_count = loop_count + 1
         if line =~ '\v^\>{79,}' || (loop_count == content_len)
+            if (loop_count == content_len)
+                let slide[line_number] = line
+                let g:posero_total_slides = g:posero_total_slides
+            else
+                let g:posero_total_slides = g:posero_total_slides + 1
+            endif
             let slide["options"] = slide_options
             let new_presentation[slide_number] = slide
             let line_number = 1
             let slide_number = slide_number + 1
             let slide = {}
             let slide_options = []
-            if (loop_count == content_len)
-                let g:posero_total_slides = g:posero_total_slides
-            else
-                let g:posero_total_slides = g:posero_total_slides + 1
-            endif
         elseif line =~ '\v^POSERO\>\>'
             let sourceable_line = split(line, "POSERO>>")[0]
             call add(slide_options, sourceable_line)
