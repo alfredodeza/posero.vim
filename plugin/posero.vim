@@ -219,9 +219,10 @@ function! s:Next(number)
         " we return here because we don't want to mix with block pushes
         return
     elseif slide[a:number] =~ "^\s*$"
-        execute "normal o"
+        put = ''
     else
-        execute "normal a" . slide[a:number]. "\<CR>"
+        execute "normal a" . slide[a:number]
+        put = ''
     endif
 
     " This pushes blocks of text that do not match fake_typing if both
