@@ -21,20 +21,20 @@ endfunction
 
 
 function! s:SetStatusLine() abort
-set statusline = ""
-set statusline+=Line:
-set statusline+=[
-set statusline+=%{g:posero_current_line}
-set statusline+=/
-set statusline+=%{posero#GetTotalLines()}
-set statusline+=]
-set statusline+=%=
-set statusline+=\ Slide:
-set statusline+=[
-set statusline+=%{g:posero_current_slide}
-set statusline+=/
-set statusline+=%{g:posero_total_slides}
-set statusline+=]
+    set statusline = ""
+    set statusline+=Line:
+    set statusline+=[
+    set statusline+=%{g:posero_current_line}
+    set statusline+=/
+    set statusline+=%{posero#GetTotalLines()}
+    set statusline+=]
+    set statusline+=%=
+    set statusline+=\ Slide:
+    set statusline+=[
+    set statusline+=%{g:posero_current_slide}
+    set statusline+=/
+    set statusline+=%{g:posero_total_slides}
+    set statusline+=]
 endfunction
 
 
@@ -162,6 +162,7 @@ function! s:NextSlide(slide_number)
     call s:SourceOptions()
     call s:SetSyntax()
     call s:AutoNextLine()
+    redraw!
 endfunction
 
 
@@ -211,7 +212,6 @@ function! s:Next(number)
     if (exists('b:posero_fake_type')) && (slide[a:number] =~ b:posero_fake_type)
         call s:FakeTyping(slide[a:number])
         if (exists("b:posero_push_all"))
-            redraw
             if has_key(slide, a:number+1)
                 call s:Next(a:number+1)
             endif
@@ -236,7 +236,6 @@ function! s:Next(number)
             call s:Next(a:number+1)
         endif
     elseif (exists("b:posero_push_all"))
-        redraw
         if has_key(slide, a:number+1)
             call s:Next(a:number+1)
         endif
