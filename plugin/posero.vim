@@ -47,6 +47,7 @@ function! s:SetGlobals() abort
     let g:posero_current_slide = 1
     let g:posero_current_line = 1
     let g:posero_total_slides = 1
+    let g:posero_faked_last = 0
 endfunction
 
 
@@ -99,7 +100,7 @@ function! s:FakeTyping(text)
         let lineno += 1
         normal $
     endfor
-    put = ''
+    let g:posero_faked_last = 1
 endfun
 
 function! s:CreateBuffer()
@@ -200,6 +201,10 @@ endfunction
 
 
 function! s:Next(number)
+    if g:posero_faked_last == 1
+        put = ''
+        let g:posero_faked_last = 0
+    endif
     let slide = g:posero_presentation[g:posero_current_slide]
     if !has_key(slide, a:number)
         let msg = "Already at the end of current slide"
