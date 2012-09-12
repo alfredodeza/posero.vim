@@ -9,8 +9,10 @@ text file to use it as presentation material.
 I consider this plugin as pre-alpha status, that is, I have it in an utterly
 inconsistent state where I keep breaking it. Try it out, let me know what
 you think and send me some feedback, but do realize this is still work in
-progress. 
+progress.
 
+
+Short screencast: http://www.youtube.com/watch?v=BtlxLAuWn3A
 
 Why oh why?
 -----------
@@ -41,10 +43,10 @@ as ``terminal_test.txt`` ::
 
      /tmp $ cd
      ~ $ cd /var
-     /var $ cd log 
+     /var $ cd log
      /var/log $ ls | grep apache
      apache2
-     /var/log $ 
+     /var/log $
 
 To execute this as a "presentation" you would start vim and type the path to
 that file::
@@ -141,7 +143,7 @@ To have a more realistic feel, you can enable *fake typing* on certain lines.
 This is done by matching the line to a regular expression set by an option on
 the actual slide.
 
-Fake typing for lines that have a dollar sign for example would be enabled like 
+Fake typing for lines that have a dollar sign for example would be enabled like
 this::
 
     POSERO>> let b:posero_fake_type = "^\$"
