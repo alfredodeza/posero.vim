@@ -230,7 +230,7 @@ function! s:Next(number)
     " again so that the lines above can take care of inserting whatever
     " we need. Note how this portion does not introduce text, it just calls
     " itself.
-    if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && (slide[a:number] !~ b:posero_fake_type)
+    if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && has_key(slide, a:number+1) && (slide[a:number+1] !~ b:posero_fake_type)
         redraw
         if has_key(slide, a:number+1)
             call s:Next(a:number+1)
