@@ -99,7 +99,7 @@ function! s:FakeTyping(text)
         let lineno += 1
         normal $
     endfor
-    execute 'normal o'
+    put = ''
 endfun
 
 function! s:CreateBuffer()
