@@ -47,6 +47,7 @@ function! s:SetGlobals() abort
     let g:posero_current_slide = 1
     let g:posero_current_line = 1
     let g:posero_total_slides = 1
+    let g:posero_faked_last = 0
 endfunction
 
 
@@ -99,7 +100,7 @@ function! s:FakeTyping(text)
         let lineno += 1
         normal $
     endfor
-    put = ''
+    let g:posero_faked_last = 1
 endfun
 
 function! s:CreateBuffer()
@@ -200,6 +201,10 @@ endfunction
 
 
 function! s:Next(number)
+    if g:posero_faked_last == 1
+        put = ''
+        let g:posero_faked_last = 0
+    endif
     let slide = g:posero_presentation[g:posero_current_slide]
     if !has_key(slide, a:number)
         let msg = "Already at the end of current slide"
@@ -230,7 +235,7 @@ function! s:Next(number)
     " again so that the lines above can take care of inserting whatever
     " we need. Note how this portion does not introduce text, it just calls
     " itself.
-    if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && (slide[a:number] !~ b:posero_fake_type)
+    if (exists("b:posero_push_on_non_fake")) && (exists('b:posero_fake_type')) && has_key(slide, a:number+1) && (slide[a:number+1] !~ b:posero_fake_type)
         redraw
         if has_key(slide, a:number+1)
             call s:Next(a:number+1)

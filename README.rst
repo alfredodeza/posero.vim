@@ -195,7 +195,7 @@ Having the ability for custom syntax highlighting is nice, but remember,
 ``Posero`` allows you to do real Vim syntax and options, so if you are
 presenting a pure Python file you could just set the filetype to python::
 
-    POSERO>> let filetype=python
+    POSERO>> set filetype=python
 
 That is also useful if you are changing from some Python to RestructuredText on
 the next slide, and you want RST syntax there. ``Posero`` will call those
